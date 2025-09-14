@@ -67,6 +67,7 @@ services:
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
       - esdata01:/usr/share/elasticsearch/data
+      - /home/kartik/Projects/ELK/cert/ssl_keystore:/usr/share/elasticsearch/config/ssl_keystore
     ports:
       - ${ES_PORT}:9200
     environment:
@@ -86,6 +87,10 @@ services:
       - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.verification_mode=certificate
       - xpack.license.self_generated.type=${LICENSE}
+      #- xpack.http.ssl.keystore.path=/usr/share/elasticsearch/config/ssl_keystore
+      #- xpack.http.ssl.truststore.path=/usr/share/elasticsearch/config/ssl_keystore
+      #- xpack.http.ssl.keystore.secure_password=password
+      #- xpack.http.ssl.truststore.secure_password=password
     mem_limit: ${ES_MEM_LIMIT}
     ulimits:
       memlock:
@@ -133,6 +138,17 @@ services:
   #    interval: 10s
   #    timeout: 10s
   #    retries: 120
+
+
+  nginx:
+    image: nginx:stable
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - /home/kartik/Projects/ELK/cert:/etc/nginx/ssl
+    ports:
+      - "443:443"
+    depends_on:
+      - kibana
 
 #   metricbeat01:
 #   depends_on:
